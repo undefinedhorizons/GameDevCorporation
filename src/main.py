@@ -4,13 +4,13 @@ from kivy.uix.button import Button
 from kivy.uix.scatterlayout import ScatterLayout
 
 
-class CorporationGame(Widget):
+class CorporationGame(ScatterLayout):
     pass
 
 
 class CorporationApp(App):
     def build(self):
-        return Button(text='hello world')
+        return CorporationGame(do_rotation=False)
 
 
 if __name__ == '__main__':
