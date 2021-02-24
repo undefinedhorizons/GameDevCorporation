@@ -10,7 +10,7 @@ class CorporationGame(Widget):
 
 class CorporationApp(App):
     def build(self):
-        return CorporationGame()
+        return Button(text='hello world')
 
 
 if __name__ == '__main__':
