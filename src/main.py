@@ -10,6 +10,7 @@ class CorporationGame(ScatterLayout):
 
 class CorporationApp(App):
     def build(self):
+        print(1)
         return CorporationGame(do_rotation=False)
 
 
