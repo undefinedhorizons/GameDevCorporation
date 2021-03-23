@@ -1,18 +1,31 @@
 from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.uix.button import Button
-from kivy.uix.scatterlayout import ScatterLayout
+from kivy.lang import Builder
+from kivy.uix.recycleview import RecycleView
 
 
-class CorporationGame(ScatterLayout):
-    pass
+Builder.load_string('''
+<RV>:
+    viewclass: 'Label'
+    RecycleGridLayout:
+        cols: 100
+        rows: 100
+        default_size: dp(50), dp(50)
+        default_size_hint: None, None
+        size_hint_y: None
+        size_hint_x: None
+        height: self.minimum_height
+        width: self.minimum_width
+''')
+
+class RV(RecycleView):
+    def __init__(self, **kwargs):
+        super(RV, self).__init__(**kwargs)
+        self.data = [{'text': str(x)} for x in range(10000)]
 
 
-class CorporationApp(App):
+class TestApp(App):
     def build(self):
-        print(1)
-        return CorporationGame(do_rotation=False)
-
+        return RV()
 
 if __name__ == '__main__':
-    CorporationApp().run()
+    TestApp().run()
