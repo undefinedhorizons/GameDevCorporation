@@ -1,17 +1,24 @@
+<GameField>:
+
+    viewclass: 'Cell'
+
+    RecycleGridLayout:
+        cols: 20
+        rows: 10
+        default_size: 100, 100
+        default_size_hint: None, None
+        size_hint_y: None
+        size_hint_x: None
+        size: self.minimum_size
+
 <CorporationGame>:
-    canvas:
-        Rectangle:
-            pos: self.center_x - 5, 0
-            size: 10, self.height
+    game_field: field
 
-    Label:
-        font_size: 70
-        center_x: root.width / 4
-        top: root.top - 50
-        text: "0"
-
-    Label:
-        font_size: 70
-        center_x: root.width * 3 / 4
-        top: root.top - 50
-        text: "0"
+    orientation: 'vertical'
+    BoxLayout:
+        size_hint: 1, 0.1
+    FloatLayout:
+        GameField:
+            id: field
+            size_hint: 1.2, 1.2
+            pos_hint: {'center': (.5, .5)}
