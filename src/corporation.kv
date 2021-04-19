@@ -1,4 +1,11 @@
 <GameField>:
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            source: 'light_blue_concrete.png'
+            size: self.size
+            pos: self.pos
 
     viewclass: 'Cell'
 
@@ -20,5 +27,5 @@
     FloatLayout:
         GameField:
             id: field
-            size_hint: 1.2, 1.2
+            size_hint: 1, 1
             pos_hint: {'center': (.5, .5)}

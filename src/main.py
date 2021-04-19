@@ -10,6 +10,14 @@ from kivy.uix.image import Image
 from kivy.uix.recycleview import RecycleView
 
 
+class CorporationUtils:
+    @staticmethod
+    def rectangle_from_image(filename="ground.png", pos=(0, 0), size=(100, 100)):
+        texture = Image(source=filename).texture
+        texture.mag_filter = 'nearest'
+        return Rectangle(texture=texture, size=size, pos=pos)
+
+
 class Cell(Button):
 
     def __init__(self, **kwargs):
@@ -71,14 +79,17 @@ class GameField(RecycleView):
 
     def fill(self, first_pos, second_pos, filename):
         for i in range(first_pos, second_pos):
-            texture = Image(source=filename).texture
-            # texture.min_filter = 'nearest'
-            texture.mag_filter = 'nearest'
-            self.data[i]['canvas'] \
-                .add(Rectangle(texture=texture,
-                               size=(self.cell_size, self.cell_size),
-                               pos=(i % self.w * self.cell_size,
-                                    (self.h - 1) * self.cell_size - i // self.w * self.cell_size)))
+            ground = CorporationUtils. \
+                rectangle_from_image(filename=filename,
+                                     size=(self.cell_size, self.cell_size),
+                                     pos=(i % self.w * self.cell_size,
+                                          (self.h - 1) * self.cell_size - i // self.w * self.cell_size))
+            self.data[i]['canvas'].add(ground)
+
+
+class Worker:
+    def __init__(self, pos=(0, 0), source='worker.png', size=(100, 100)):
+        self.pos = pos
 
 
 class CorporationGame(BoxLayout):
@@ -101,6 +112,10 @@ class CorporationGame(BoxLayout):
         # for worker in self.workers:
         #     worker.update()
 
+    # sv.x - sv.scroll_x * (sv.viewport_size[0] - sv.width), sv.y + sv.scroll_y * (sv.viewport_size[1] - sv.height)
+    def place_worker(self, pos, num):
+        pass
+
     def place_office(self, pos, num):
         x, y = pos
         n = num
@@ -111,7 +126,6 @@ class CorporationGame(BoxLayout):
                 if n == i:
                     is_placing_confirmed = True
                     break
-
 
             k = 0
             for i in self.office_buffer:
@@ -160,27 +174,19 @@ class CorporationGame(BoxLayout):
             if can_be_placed:
                 cur_cell['canvas'].add(office_block)
 
-                overlay_texture = Image(source='blue_overlay.png').texture
-                # texture.mag_filter = 'nearest'
-                overlay = Rectangle(texture=overlay_texture,
-                                    size=(100, 100),
-                                    pos=(x + i * self.game_field.cell_size, y))
-
+                overlay = CorporationUtils.rectangle_from_image(filename='blue_overlay.png',
+                                                                size=(100, 100),
+                                                                pos=(x + i * self.game_field.cell_size, y))
                 cur_cell['canvas'].add(overlay)
 
                 self.office_texture_buffer.append(office_block)
                 self.office_buffer.append(n + i)
                 self.overlay_buffer.append(overlay)
                 self.is_office_being_built = True
-
-                # cur_cell['contains_office'] = True
             else:
-                overlay_texture = Image(source='red_overlay.png').texture
-                # texture.mag_filter = 'nearest'
-
-                overlay = Rectangle(texture=overlay_texture,
-                                    size=(100, 100),
-                                    pos=(x + i * self.game_field.cell_size, y))
+                overlay = CorporationUtils.rectangle_from_image(filename='red_overlay.png',
+                                                                size=(100, 100),
+                                                                pos=(x + i * self.game_field.cell_size, y))
 
                 cur_cell['canvas'].add(overlay)
 
