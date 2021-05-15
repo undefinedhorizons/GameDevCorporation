@@ -104,7 +104,6 @@ class CorporationGame(BoxLayout):
         #     worker.update()
 
     def place(self, pos, num):
-        self.money -= 100
 
         if self.current_state == 'worker':
             self.place_worker(pos, num)
@@ -126,6 +125,7 @@ class CorporationGame(BoxLayout):
 
         cur_cell = self.game_field.data[n]
         if cur_cell['contains_office']:
+            self.money -= 100
             cur_cell['canvas'].add(w.update_rectangle())
 
     def place_office(self, pos, num):
@@ -137,6 +137,7 @@ class CorporationGame(BoxLayout):
             for i in self.office_buffer:
                 if n == i:
                     is_placing_confirmed = True
+                    self.money -= 1000
                     break
 
             k = 0
