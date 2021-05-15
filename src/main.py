@@ -85,7 +85,7 @@ class CorporationGame(BoxLayout):
     office_buffer = []
     is_office_being_built = False
 
-    current_state = 'office'
+    current_state = 'none'
 
     def __init__(self, **kwargs):
         super(CorporationGame, self).__init__(**kwargs)
