@@ -1,8 +1,10 @@
 from kivy.app import App
+from kivy.clock import Clock
+from kivy.uix.label import Label
 from kivy.graphics import Rectangle
 from kivy.graphics.instructions import Canvas
 from kivy.properties import (
-    ObjectProperty, BooleanProperty
+    ObjectProperty, BooleanProperty, NumericProperty
 )
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -76,6 +78,8 @@ class Worker:
 class CorporationGame(BoxLayout):
     game_field = ObjectProperty(None)
     gui = ObjectProperty(None)
+    money_display = None
+    money = 0
 
     workers = []
     offices = []
@@ -93,12 +97,15 @@ class CorporationGame(BoxLayout):
     def set_state(self, state):
         self.current_state = state
 
-    def tick(self):
-        pass
+    def tick(self, dt):
+        self.money_display.text = str(self.money)
+
         # for worker in self.workers:
         #     worker.update()
 
     def place(self, pos, num):
+        self.money -= 100
+
         if self.current_state == 'worker':
             self.place_worker(pos, num)
             return
@@ -219,19 +226,25 @@ class CorporationApp(App):
     def build(self):
         self.game = CorporationGame()
         self.load_gui()
+        Clock.schedule_interval(self.game.tick, 1.0 / 60.0)
+
 
         return self.game
 
     def load_gui(self):
         build_office = Button(text='office',size_hint=(.2, .2), pos_hint={'x': .01, 'y': .79})
         build_worker = Button(text='worker',size_hint=(.2, .2), pos_hint={'x': .22, 'y': .79})
+        money_display = Button(text=str(get_game().money),size_hint=(.2, .2), pos_hint={'x': .79, 'y': .79})
+
+        get_game().money_display = money_display
 
         build_worker.bind(on_press=switch_state)
         build_office.bind(on_press=switch_state)
 
-        get_game().gui.add_widget(build_office)
-        get_game().gui.add_widget(build_worker)
-
+        gui = get_game().gui
+        gui.add_widget(build_office)
+        gui.add_widget(build_worker)
+        gui.add_widget(money_display)
 
 
 if __name__ == '__main__':
