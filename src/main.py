@@ -22,40 +22,14 @@ class Cell(Button):
 
     def __init__(self, **kwargs):
         super(Button, self).__init__(**kwargs)
-        if kwargs != {}:
-            self.position = kwargs['position']
-            self.number = kwargs['number']
-            self.contains_office = kwargs['contains_office']
+        self.position = None
+        self.number = None
+        self.contains_office = None
         self.office_texture = None
-
         self.overlay = None
 
     def on_press(self):
-        get_game().place_office(self.position, self.number)
-        # self.contains_office = True
-        # texture = Image(source='office.png').texture
-
-        # buf = []
-        # for i in texture.pixels:
-        #     buf.append(i)
-        #
-        # for i in range(3, len(texture.pixels), 4):
-        #     # buf[i - 3] = min(int(buf[i - 3] * 1.5), 255)
-        #     buf[i - 2] = 0
-        #     buf[i - 1] = 0
-        #     buf[i] = 200
-        #
-        # arr = array('B', buf)
-        #
-        # texture = Texture.create(colorfmt='rgba', size=texture.size)
-        # texture.blit_buffer(arr, colorfmt='rgba', bufferfmt='ubyte')
-        #
-        # texture.mag_filter = 'nearest'
-
-        # self.office_texture = Rectangle(texture=texture,
-        #                                 size=(600, 100),
-        #                                 pos=self.position)
-        # self.canvas.add(self.office_texture)
+        get_game().place(self.position, self.number)
 
 
 class GameField(RecycleView):
@@ -74,7 +48,6 @@ class GameField(RecycleView):
                       'workers': []}
                      for x in range(self.h * self.w)]
 
-        # self.fill(0, 90, 'light_blue_concrete.png')
         self.fill((self.h - 1) * self.w, self.h * self.w, 'ground.png')
 
     def fill(self, first_pos, second_pos, filename):
@@ -88,12 +61,22 @@ class GameField(RecycleView):
 
 
 class Worker:
-    def __init__(self, pos=(0, 0), source='worker.png', size=(100, 100)):
+    def __init__(self, pos=(0, 0), source='worker.png', size=(100, 100), id=0, rectangle=None):
         self.pos = pos
+        self.source = source
+        self.size = size
+        self.id = id
+        self.rectangle = rectangle
+
+    def update_rectangle(self):
+        self.rectangle = CorporationUtils.rectangle_from_image(filename=self.source, size=self.size, pos=self.pos)
+        return self.rectangle
 
 
 class CorporationGame(BoxLayout):
     game_field = ObjectProperty(None)
+    gui = ObjectProperty(None)
+
     workers = []
     offices = []
 
@@ -102,19 +85,41 @@ class CorporationGame(BoxLayout):
     office_buffer = []
     is_office_being_built = False
 
-    current_state = 'building'
+    current_state = 'office'
 
     def __init__(self, **kwargs):
         super(CorporationGame, self).__init__(**kwargs)
+
+    def set_state(self, state):
+        self.current_state = state
 
     def tick(self):
         pass
         # for worker in self.workers:
         #     worker.update()
 
-    # sv.x - sv.scroll_x * (sv.viewport_size[0] - sv.width), sv.y + sv.scroll_y * (sv.viewport_size[1] - sv.height)
+    def place(self, pos, num):
+        if self.current_state == 'worker':
+            self.place_worker(pos, num)
+            return
+
+        if self.current_state == 'office':
+            self.place_office(pos, num)
+            return
+
     def place_worker(self, pos, num):
-        pass
+        w = Worker(pos=pos, id=len(self.workers) + 1)
+        # self.workers.append(w)
+
+        x, y = pos
+        n = num
+
+        if n >= (self.game_field.h - 1) * self.game_field.w:
+            return
+
+        cur_cell = self.game_field.data[n]
+        if cur_cell['contains_office']:
+            cur_cell['canvas'].add(w.update_rectangle())
 
     def place_office(self, pos, num):
         x, y = pos
@@ -198,12 +203,35 @@ def get_game():
     return CorporationApp.get_running_app().game
 
 
+def switch_state(instance):
+    state = get_game().current_state
+    print(state)
+
+    if instance.text == state:
+        get_game().set_state('none')
+        return
+
+    get_game().set_state(instance.text)
+
 class CorporationApp(App):
     game = None
 
     def build(self):
         self.game = CorporationGame()
+        self.load_gui()
+
         return self.game
+
+    def load_gui(self):
+        build_office = Button(text='office',size_hint=(.2, .2), pos_hint={'x': .01, 'y': .79})
+        build_worker = Button(text='worker',size_hint=(.2, .2), pos_hint={'x': .22, 'y': .79})
+
+        build_worker.bind(on_press=switch_state)
+        build_office.bind(on_press=switch_state)
+
+        get_game().gui.add_widget(build_office)
+        get_game().gui.add_widget(build_worker)
+
 
 
 if __name__ == '__main__':

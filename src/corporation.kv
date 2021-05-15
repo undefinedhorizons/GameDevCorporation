@@ -3,7 +3,7 @@
         Color:
             rgba: 1, 1, 1, 1
         Rectangle:
-            source: 'light_blue_concrete.png'
+            source: 'sky.png'
             size: self.size
             pos: self.pos
 
@@ -20,11 +20,11 @@
 
 <CorporationGame>:
     game_field: field
+    gui: gui_id
 
     orientation: 'vertical'
-    BoxLayout:
-        size_hint: 1, 0.1
     FloatLayout:
+        id: gui_id
         GameField:
             id: field
             size_hint: 1, 1
