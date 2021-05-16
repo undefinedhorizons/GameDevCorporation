@@ -104,7 +104,6 @@ class CorporationGame(BoxLayout):
         #     worker.update()
 
     def place(self, pos, num):
-
         if self.current_state == 'worker':
             self.place_worker(pos, num)
             return
@@ -117,7 +116,6 @@ class CorporationGame(BoxLayout):
         w = Worker(pos=pos, id=len(self.workers) + 1)
         # self.workers.append(w)
 
-        x, y = pos
         n = num
 
         if n >= (self.game_field.h - 1) * self.game_field.w:
@@ -171,12 +169,7 @@ class CorporationGame(BoxLayout):
             if self.game_field.data[n + i]['contains_office']:
                 can_be_placed = False
 
-        k = 0
-        for i in self.office_buffer:
-            self.game_field.data[i]['canvas'].remove(self.overlay_buffer[k])
-            k += 1
-        self.office_buffer.clear()
-        self.overlay_buffer.clear()
+        self.clear_office_buffer()
 
         for i in range(6):
             texture_region = texture.get_region(16 * i, 0, 16, 16)
@@ -206,20 +199,37 @@ class CorporationGame(BoxLayout):
                 self.office_buffer.append(n + i)
                 self.overlay_buffer.append(overlay)
 
+    def clear_office_buffer(self):
+        k = 0
+        for i in self.office_buffer:
+            self.game_field.data[i]['canvas'].remove(self.overlay_buffer[k])
+            k += 1
+        self.office_buffer.clear()
+        self.overlay_buffer.clear()
+
 
 def get_game():
     return CorporationApp.get_running_app().game
 
 
 def switch_state(instance):
-    state = get_game().current_state
-    print(state)
-
-    if instance.text == state:
+    if instance.text == get_game().current_state:
         get_game().set_state('none')
         return
 
     get_game().set_state(instance.text)
+
+    if get_game().current_state != 'office':
+        if get_game().is_office_being_built:
+            k = 0
+            for i in get_game().office_buffer:
+                get_game().game_field.data[i]['canvas'].remove(get_game().office_texture_buffer[k])
+                k += 1
+            get_game().is_office_being_built = False
+
+        get_game().clear_office_buffer()
+
+
 
 class CorporationApp(App):
     game = None
@@ -228,8 +238,6 @@ class CorporationApp(App):
         self.game = CorporationGame()
         self.load_gui()
         Clock.schedule_interval(self.game.tick, 1.0 / 60.0)
-
-
         return self.game
 
     def load_gui(self):
