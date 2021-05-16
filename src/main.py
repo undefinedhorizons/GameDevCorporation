@@ -23,7 +23,7 @@ class CorporationUtils:
 class Cell(Button):
 
     def __init__(self, **kwargs):
-        super(Button, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.position = None
         self.number = None
         self.contains_office = None
@@ -37,7 +37,7 @@ class Cell(Button):
 class GameField(RecycleView):
 
     def __init__(self, **kwargs):
-        super(GameField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         self.h, self.w = 10, 20
 
@@ -63,16 +63,39 @@ class GameField(RecycleView):
 
 
 class Worker:
-    def __init__(self, pos=(0, 0), source='worker.png', size=(100, 100), id=0, rectangle=None):
+    def __init__(self, pos=(0, 0), source='worker.png', size=(100, 100), id=0, rectangle=None, n=0):
         self.pos = pos
         self.source = source
         self.size = size
         self.id = id
         self.rectangle = rectangle
+        self.parent_n = n
+        self.dx = 0
 
     def update_rectangle(self):
         self.rectangle = CorporationUtils.rectangle_from_image(filename=self.source, size=self.size, pos=self.pos)
         return self.rectangle
+
+    def update_parent_n(self):
+        if self.dx == 100:
+            self.parent_n += 1
+            self.dx = 0
+
+    def update(self):
+        self.move(1)
+
+    def move(self, x):
+        get_game().game_field.data[self.parent_n]['canvas'].remove(self.rectangle)
+
+        x0, y0 = self.pos
+        self.pos = (x + x0, y0)
+
+        self.update_rectangle()
+
+        self.dx += x
+        self.update_parent_n()
+
+        get_game().game_field.data[self.parent_n]['canvas'].add(self.rectangle)
 
 
 class CorporationGame(BoxLayout):
@@ -92,7 +115,7 @@ class CorporationGame(BoxLayout):
     current_state = 'none'
 
     def __init__(self, **kwargs):
-        super(CorporationGame, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def set_state(self, state):
         self.current_state = state
@@ -100,8 +123,8 @@ class CorporationGame(BoxLayout):
     def tick(self, dt):
         self.money_display.text = str(self.money)
 
-        # for worker in self.workers:
-        #     worker.update()
+        for worker in self.workers:
+            worker.update()
 
     def place(self, pos, num):
         if self.current_state == 'worker':
@@ -112,23 +135,19 @@ class CorporationGame(BoxLayout):
             self.place_office(pos, num)
             return
 
-    def place_worker(self, pos, num):
-        w = Worker(pos=pos, id=len(self.workers) + 1)
-        # self.workers.append(w)
-
-        n = num
-
+    def place_worker(self, pos, n):
         if n >= (self.game_field.h - 1) * self.game_field.w:
             return
 
         cur_cell = self.game_field.data[n]
         if cur_cell['contains_office']:
+            w = Worker(pos=pos, id=len(self.workers) + 1, n=n)
+            self.workers.append(w)
             self.money -= 100
             cur_cell['canvas'].add(w.update_rectangle())
 
-    def place_office(self, pos, num):
+    def place_office(self, pos, n):
         x, y = pos
-        n = num
 
         if self.is_office_being_built:
             is_placing_confirmed = False
