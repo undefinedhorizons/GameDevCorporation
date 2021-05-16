@@ -77,9 +77,13 @@ class Worker:
 
 class CorporationGame(BoxLayout):
     game_field = ObjectProperty(None)
+
     gui = ObjectProperty(None)
     money_display = None
+    layout_worker = None
     money = 0
+    is_worker_opened = False
+    is_office_opened = False
 
     workers = []
     offices = []
@@ -89,6 +93,8 @@ class CorporationGame(BoxLayout):
     office_buffer = []
     is_office_being_built = False
 
+    current_office = 'Office1'
+    current_worker = 'Worker1'
     current_state = 'none'
 
     def __init__(self, **kwargs):
@@ -126,6 +132,7 @@ class CorporationGame(BoxLayout):
         cur_cell = self.game_field.data[n]
         if cur_cell['contains_office']:
             self.money -= 100
+            print(self.current_worker)
             cur_cell['canvas'].add(w.update_rectangle())
 
     def place_office(self, pos, num):
@@ -137,7 +144,10 @@ class CorporationGame(BoxLayout):
             for i in self.office_buffer:
                 if n == i:
                     is_placing_confirmed = True
+
                     self.money -= 1000
+                    print(self.current_office)
+
                     break
 
             k = 0
@@ -218,8 +228,66 @@ def switch_state(instance):
     if instance.text == state:
         get_game().set_state('none')
         return
-
     get_game().set_state(instance.text)
+
+class SelectButtonWorker(Button):
+    def __init__(self, worker_name='Worker1', **kwargs):
+        self.worker_name = worker_name
+        super().__init__(**kwargs)
+
+    def on_press(self):
+        get_game().current_worker = self.worker_name
+
+class SelectButtonOffice(Button):
+    def __init__(self, office_name='Worker1', **kwargs):
+        self.office_name = office_name
+        super().__init__(**kwargs)
+
+    def on_press(self):
+        get_game().current_office = self.office_name
+
+
+def on_press_worker(instance):
+    switch_state(instance)
+    if not get_game().is_worker_opened:
+        if get_game().is_office_opened:
+            get_game().gui.remove_widget(get_game().layout_office)
+            get_game().is_office_opened = False
+        layout_worker = BoxLayout(orientation='horizontal', size_hint=(.4, .5))
+        build_worker1 = SelectButtonWorker(worker_name='Worker1', text='worker1', size_hint=(.2, .2), pos_hint={'x': .22, 'y': .79})
+        build_worker2 = SelectButtonWorker(worker_name='Worker2', text='worker2', size_hint=(.2, .2), pos_hint={'x': .22, 'y': .79})
+        layout_worker.add_widget(build_worker1)
+        layout_worker.add_widget(build_worker2)
+        get_game().gui.add_widget(layout_worker)
+
+        get_game().layout_worker = layout_worker
+        get_game().is_worker_opened = True
+    else:
+        get_game().gui.remove_widget(get_game().layout_worker)
+        get_game().is_worker_opened = False
+
+
+def on_press_office(instance):
+    switch_state(instance)
+    if not get_game().is_office_opened:
+        if get_game().is_worker_opened:
+            get_game().gui.remove_widget(get_game().layout_worker)
+            get_game().is_worker_opened = False
+        layout_office = BoxLayout(orientation='horizontal', size_hint=(.5, .6))
+        build_office1 = SelectButtonOffice(office_name='Office1', text='office1', size_hint=(.2, .2),
+                                     pos_hint={'x': .22, 'y': .79})
+        build_office2 = SelectButtonOffice(office_name='Office2', text='office2', size_hint=(.2, .2),
+                                     pos_hint={'x': .22, 'y': .79})
+        layout_office.add_widget(build_office1)
+        layout_office.add_widget(build_office2)
+        get_game().gui.add_widget(layout_office)
+
+        get_game().layout_office = layout_office
+        get_game().is_office_opened = True
+    else:
+        get_game().gui.remove_widget(get_game().layout_office)
+        get_game().is_office_opened = False
+
 
 class CorporationApp(App):
     game = None
@@ -233,14 +301,14 @@ class CorporationApp(App):
         return self.game
 
     def load_gui(self):
-        build_office = Button(text='office',size_hint=(.2, .2), pos_hint={'x': .01, 'y': .79})
-        build_worker = Button(text='worker',size_hint=(.2, .2), pos_hint={'x': .22, 'y': .79})
-        money_display = Button(text=str(get_game().money),size_hint=(.2, .2), pos_hint={'x': .79, 'y': .79})
+        build_office = Button(text='office', size_hint=(.2, .2), pos_hint={'x': .01, 'y': .79})
+        build_worker = Button(text='worker', size_hint=(.2, .2), pos_hint={'x': .24, 'y': .79})
+        money_display = Button(text=str(get_game().money), size_hint=(.2, .2), pos_hint={'x': .79, 'y': .79})
 
         get_game().money_display = money_display
 
-        build_worker.bind(on_press=switch_state)
-        build_office.bind(on_press=switch_state)
+        build_worker.bind(on_press=on_press_worker)
+        build_office.bind(on_press=on_press_office)
 
         gui = get_game().gui
         gui.add_widget(build_office)
