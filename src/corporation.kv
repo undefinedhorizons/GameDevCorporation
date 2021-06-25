@@ -7,26 +7,26 @@
             size: self.size
             pos: self.pos
 
-    viewclass: 'Cell'
-
-    RecycleGridLayout:
-        cols: 20
-        rows: 10
-        default_size: 100, 100
-        default_size_hint: None, None
-        size_hint_y: None
-        size_hint_x: None
-        size: self.minimum_size
+    cols: 20
+    rows: 10
+    default_size: 100, 100
+    default_size_hint: None, None
+    size_hint_y: None
+    size_hint_x: None
+    size: self.minimum_size
 
 <CorporationGame>:
     game_field: field
     gui: gui_id
+    object_layer: obj
+    worker_layer: worker
 
     orientation: 'vertical'
+    GameField:
+        id: field
+    FloatLayout:
+        id: obj
+    FloatLayout:
+        id: worker
     FloatLayout:
         id: gui_id
-
-        GameField:
-            id: field
-            size_hint: 1, 1
-            pos_hint: {'center': (.5, .5)}

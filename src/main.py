@@ -1,5 +1,8 @@
+from abc import ABC, abstractmethod, ABCMeta
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.graphics import Rectangle
 from kivy.graphics.instructions import Canvas
@@ -9,57 +12,137 @@ from kivy.properties import (
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.image import Image
+from kivy.core.window import Window
 from kivy.uix.recycleview import RecycleView
+from kivy.uix.widget import Widget
 
 
-class CorporationUtils:
+class Utils:
     @staticmethod
-    def rectangle_from_image(filename="ground.png", pos=(0, 0), size=(100, 100)):
+    def get_rectangle(filename="ground.png", pos=(0, 0), size=(100, 100)):
         texture = Image(source=filename).texture
         texture.mag_filter = 'nearest'
         return Rectangle(texture=texture, size=size, pos=pos)
 
 
-class Cell(Button):
-
-    def __init__(self, **kwargs):
+class GameObject(Button):
+    def __init__(self, picture='air.png', cell_size=100, position=(-1, -1), **kwargs):
         super().__init__(**kwargs)
-        self.position = None
-        self.number = None
-        self.contains_office = None
-        self.office_texture = None
-        self.overlay = None
+        self.background_normal = picture
+        self.background_down = self.background_normal
+
+        if position != (-1, -1):
+            self.pos = get_game().game_field.get_pos(position)
+
+
+class MyMeta(ABCMeta, type(GameObject)):
+    pass
+
+
+class Room(ABC, metaclass=MyMeta):
+    def __init__(self):
+        self.price
+        self.pertime
+        self.capacity
+        self.reliability
+        self.breakdown
+        self.income
+
+    @abstractmethod
+    def update(self):
+        pass
+
+    @abstractmethod
+    def repair(self):
+        pass
+
+
+class Office(GameObject):
+    def __init__(self, cell_size=100, position=(0, 0), picture='../res/office.png', **kwargs):
+        self.price = 1000
+        self.pertime = 50
+        self.capacity = 4
+        self.reliability = 1000
+        self.breakdown = 15
+        self.income = 100
+
+        super().__init__(picture, **kwargs)
+
+        self.size = (6 * cell_size, cell_size)
+
+    def update(self):
+        self.reliability -= self.breakdown
+
+    def repair(self):
+        self.reliability = (self.reliability + self.breakdown * 4) % 1000
+
+
+class Cell(GameObject):
+    def __init__(self, position=(0, 0), **kwargs):
+        super().__init__(**kwargs)
+        self.position = position
+        self.contains_office = False
 
     def on_press(self):
-        get_game().place(self.position, self.number)
+        print(self.position)
+        get_game().place(self.position)
 
 
-class GameField(RecycleView):
+class Grass(GameObject):
+    def __init__(self, picture='../res/ground.png', cell_size=100, **kwargs):
+        super().__init__(picture, **kwargs)
+        self.size = (cell_size, cell_size)
 
+
+class GameField(GridLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         self.h, self.w = 10, 20
+        self.cell_size = Window.height / self.h
 
-        self.cell_size = 100
-        self.data = [{'canvas': Canvas(),
-                      'position': (x % self.w * self.cell_size,
-                                   (self.h - 1) * self.cell_size - x // self.w * self.cell_size),
-                      'number': x,
-                      'contains_office': False,
-                      'workers': []}
-                     for x in range(self.h * self.w)]
+        self.data = [[Cell(position=(x, y),
+                           height=self.cell_size,
+                           width=self.cell_size,
+                           size_hint=(None, None))
+                      for x in range(self.w)] for y in range(self.h)]
 
-        self.fill((self.h - 1) * self.w, self.h * self.w, 'ground.png')
+        for i in self.data:
+            for j in i:
+                self.add_widget(j)
 
-    def fill(self, first_pos, second_pos, filename):
-        for i in range(first_pos, second_pos):
-            ground = CorporationUtils. \
-                rectangle_from_image(filename=filename,
-                                     size=(self.cell_size, self.cell_size),
-                                     pos=(i % self.w * self.cell_size,
-                                          (self.h - 1) * self.cell_size - i // self.w * self.cell_size))
-            self.data[i]['canvas'].add(ground)
+    def fill_grass(self):
+        self.create_grass(first_pos=(0, self.h - 1), second_pos=(self.w - 1, self.h - 1))
+
+    def create_grass(self, first_pos, second_pos):
+        x = first_pos[0]
+        while x != second_pos[0]:
+            get_game() \
+                .object_layer \
+                .add_widget(Grass(pos=self.get_pos((x, second_pos[1])),
+                                  size_hint=(None, None), cell_size=self.cell_size,
+                                  ))
+            x += 1
+
+    def can_be_placed(self, pos):
+        for i in range(6):
+            print(pos[0] + i, pos[1])
+            if self.data[pos[1]][pos[0] + i].contains_office:
+                return False
+
+        if pos[1] == self.h - 2:
+            return True
+
+        flag = False
+        for i in range(6):
+            if self.data[pos[1] + 1][pos[0] + i].contains_office:
+                flag = True
+
+        return flag
+
+    def get_pos(self, pos):
+        x, y = pos
+        return x * self.cell_size, (self.h - 1 - y) * self.cell_size
 
 
 class Worker:
@@ -73,7 +156,7 @@ class Worker:
         self.dx = 0
 
     def update_rectangle(self):
-        self.rectangle = CorporationUtils.rectangle_from_image(filename=self.source, size=self.size, pos=self.pos)
+        self.rectangle = Utils.get_rectangle(filename=self.source, size=self.size, pos=self.pos)
         return self.rectangle
 
     def update_parent_n(self):
@@ -98,9 +181,12 @@ class Worker:
         get_game().game_field.data[self.parent_n]['canvas'].add(self.rectangle)
 
 
-class CorporationGame(BoxLayout):
+class CorporationGame(FloatLayout):
     game_field = ObjectProperty(None)
+    object_layer = ObjectProperty(None)
+    worker_layer = ObjectProperty(None)
     gui = ObjectProperty(None)
+
     money_display = None
     money = 0
 
@@ -117,6 +203,9 @@ class CorporationGame(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    def prepare(self):
+        self.game_field.fill_grass()
+
     def set_state(self, state):
         self.current_state = state
 
@@ -126,16 +215,16 @@ class CorporationGame(BoxLayout):
         for worker in self.workers:
             worker.update()
 
-    def place(self, pos, num):
+    def place(self, pos):
         if self.current_state == 'worker':
-            self.place_worker(pos, num)
+            self.place_worker(pos)
             return
 
         if self.current_state == 'office':
-            self.place_office(pos, num)
+            self.place_office(pos)
             return
 
-    def place_worker(self, pos, n):
+    def place_worker(self, pos):
         if n >= (self.game_field.h - 1) * self.game_field.w:
             return
 
@@ -146,85 +235,14 @@ class CorporationGame(BoxLayout):
             self.money -= 100
             cur_cell['canvas'].add(w.update_rectangle())
 
-    def place_office(self, pos, n):
-        x, y = pos
-
-        if self.is_office_being_built:
-            is_placing_confirmed = False
-            for i in self.office_buffer:
-                if n == i:
-                    is_placing_confirmed = True
-                    self.money -= 1000
-                    break
-
-            k = 0
-            for i in self.office_buffer:
-                cur_cell = self.game_field.data[i]
-                cur_cell['canvas'].remove(self.overlay_buffer[k])
-                if is_placing_confirmed:
-                    cur_cell['contains_office'] = True
-                else:
-                    cur_cell['canvas'].remove(self.office_texture_buffer[k])
-                k += 1
-
-            self.office_buffer.clear()
-            self.office_texture_buffer.clear()
-            self.overlay_buffer.clear()
-            self.is_office_being_built = False
-            if is_placing_confirmed:
-                return
-
-        texture = Image(source='office.png').texture
-        texture.mag_filter = 'nearest'
-
-        if n >= (self.game_field.h - 1) * self.game_field.w:
-            return
-
-        can_be_placed = (self.game_field.h - 2) * self.game_field.w <= n < (self.game_field.h - 1) * self.game_field.w
-        for i in range(6):
-            if self.game_field.data[n + self.game_field.w + i]['contains_office']:
-                can_be_placed = True
-        for i in range(6):
-            if self.game_field.data[n + i]['contains_office']:
-                can_be_placed = False
-
-        self.clear_office_buffer()
-
-        for i in range(6):
-            texture_region = texture.get_region(16 * i, 0, 16, 16)
-            office_block = Rectangle(texture=texture_region,
-                                     size=(100, 100),
-                                     pos=(x + i * self.game_field.cell_size, y))
-            cur_cell = self.game_field.data[n + i]
-            if can_be_placed:
-                cur_cell['canvas'].add(office_block)
-
-                overlay = CorporationUtils.rectangle_from_image(filename='blue_overlay.png',
-                                                                size=(100, 100),
-                                                                pos=(x + i * self.game_field.cell_size, y))
-                cur_cell['canvas'].add(overlay)
-
-                self.office_texture_buffer.append(office_block)
-                self.office_buffer.append(n + i)
-                self.overlay_buffer.append(overlay)
-                self.is_office_being_built = True
-            else:
-                overlay = CorporationUtils.rectangle_from_image(filename='red_overlay.png',
-                                                                size=(100, 100),
-                                                                pos=(x + i * self.game_field.cell_size, y))
-
-                cur_cell['canvas'].add(overlay)
-
-                self.office_buffer.append(n + i)
-                self.overlay_buffer.append(overlay)
-
-    def clear_office_buffer(self):
-        k = 0
-        for i in self.office_buffer:
-            self.game_field.data[i]['canvas'].remove(self.overlay_buffer[k])
-            k += 1
-        self.office_buffer.clear()
-        self.overlay_buffer.clear()
+    def place_office(self, pos):
+        if self.game_field.can_be_placed(pos):
+            self.object_layer.\
+                add_widget(Office(pos=self.game_field.get_pos(pos),
+                                  cell_size=self.game_field.cell_size,
+                                  size_hint=(None, None)))
+            for i in range(6):
+                self.game_field.data[pos[1]][pos[0] + i].contains_office = True
 
 
 def get_game():
@@ -249,20 +267,20 @@ def switch_state(instance):
         get_game().clear_office_buffer()
 
 
-
 class CorporationApp(App):
     game = None
 
     def build(self):
         self.game = CorporationGame()
+        self.game.prepare()
         self.load_gui()
         Clock.schedule_interval(self.game.tick, 1.0 / 60.0)
         return self.game
 
     def load_gui(self):
-        build_office = Button(text='office',size_hint=(.2, .2), pos_hint={'x': .01, 'y': .79})
-        build_worker = Button(text='worker',size_hint=(.2, .2), pos_hint={'x': .22, 'y': .79})
-        money_display = Button(text=str(get_game().money),size_hint=(.2, .2), pos_hint={'x': .79, 'y': .79})
+        build_office = Button(text='office', size_hint=(.2, .2), pos_hint={'x': .01, 'y': .79})
+        build_worker = Button(text='worker', size_hint=(.2, .2), pos_hint={'x': .22, 'y': .79})
+        money_display = Button(text=str(get_game().money), size_hint=(.2, .2), pos_hint={'x': .79, 'y': .79})
 
         get_game().money_display = money_display
 
