@@ -14,6 +14,7 @@ from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.uix.recycleview import RecycleView
 
+
 class Button2(Button):
     def on_press(self):
         sound = SoundLoader.load('knopka.wav')
@@ -26,7 +27,6 @@ class CorporationUtils:
         texture = Image(source=filename).texture
         texture.mag_filter = 'nearest'
         return Rectangle(texture=texture, size=size, pos=pos)
-
 
 
 class Cell(Button):
@@ -69,7 +69,6 @@ class GameField(RecycleView):
                                      pos=(i % self.w * self.cell_size,
                                           (self.h - 1) * self.cell_size - i // self.w * self.cell_size))
             self.data[i]['canvas'].add(ground)
-
 
 
 class Room(ABC):
@@ -116,23 +115,48 @@ class Office(Room):
         self.realiability -= self.breakdown
 
     def repair(self):
-        self.realiability =(self.realiability + self.breakdown * 4) % 1000
+        self.realiability = (self.realiability + self.breakdown * 4) % 1000
 
 
 class Elevator(Room):
     pass
 
+class Person(ABC):
+    def __init__(self):
+        self.pos
+        self.source
+        self.size
+        self.id
+        self.rectangle
 
-class Worker:
+    @abstractmethod
+    def update_rectangle(self):
+        pass
+
+
+class Worker(Person):
     def __init__(self, pos=(0, 0), source='worker.png', size=(100, 100), id=0, rectangle=None):
         self.pos = pos
-        self.source = source
-        self.size = size
-        self.id = id
-        self.rectangle = rectangle
+        self.source = 'worker.png'
+        self.size = (100, 100)
+        self.id = 0
+        self.rectangle = None
 
     def update_rectangle(self):
-        self.rectangle = CorporationUtils.rectangle_from_image(filename = self.source, size=self.size, pos=self.pos)
+        self.rectangle = CorporationUtils.rectangle_from_image(filename=self.source, size=self.size, pos=self.pos)
+        return self.rectangle
+
+
+class RepairMan(Person):
+    def __init__(self, pos=(0, 0), source='RepairMan.png', size=(100, 100), id=0, rectangle=None):
+        self.pos = pos
+        self.source = source
+        self.size = (100, 100)
+        self.id = 0
+        self.rectangle = None
+
+    def update_rectangle(self):
+        self.rectangle = CorporationUtils.rectangle_from_image(filename=self.source, size=self.size, pos=self.pos)
         return self.rectangle
 
 
@@ -147,6 +171,7 @@ class CorporationGame(BoxLayout):
     is_office_opened = False
 
     workers = []
+    repairman = []
     offices = []
 
     office_texture_buffer = []
@@ -156,6 +181,7 @@ class CorporationGame(BoxLayout):
 
     current_office = 'Office1'
     current_worker = 'Worker1'
+    current_repairman = 'RepairMan'
     current_state = 'none'
 
     def __init__(self, **kwargs):
@@ -301,7 +327,7 @@ class SelectButtonWorker(Button2):
         get_game().current_worker = self.worker_name
 
 class SelectButtonOffice(Button2):
-    def __init__(self, office_name='Worker1', **kwargs):
+    def __init__(self, office_name='Office', **kwargs):
         self.office_name = office_name
         super().__init__(**kwargs)
 
@@ -356,9 +382,9 @@ class ButtonWorker(Button2):
                 get_game().gui.remove_widget(get_game().layout_office)
                 get_game().is_office_opened = False
             layout_worker = BoxLayout(orientation='horizontal', size_hint=(.5, .6))
-            build_worker1 = SelectButtonWorker(worker_name='Worker1', text='worker1', size_hint=(.2, .2),
+            build_worker1 = SelectButtonWorker(worker_name='Worker', text='Worker', size_hint=(.2, .2),
                                         pos_hint={'x': .22, 'y': .79})
-            build_worker2 = SelectButtonWorker(worker_name='Worker2', text='worker2', size_hint=(.2, .2),
+            build_worker2 = SelectButtonWorker(worker_name='RepairMan', text='RepairMan', size_hint=(.2, .2),
                                         pos_hint={'x': .22, 'y': .79})
             layout_worker.add_widget(build_worker1)
             layout_worker.add_widget(build_worker2)
