@@ -1,5 +1,6 @@
 from utils import GameObject
 
+
 class Worker(GameObject):
     def __init__(self, cell_size=100, position=(0, 0), picture='../res/worker.png', **kwargs):
         self.price = 1000
