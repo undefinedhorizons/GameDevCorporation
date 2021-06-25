@@ -1,39 +1,15 @@
 from abc import ABC, abstractmethod, ABCMeta
+
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.core.window import Window
+from kivy.properties import (
+    ObjectProperty
+)
+from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
-from kivy.graphics import Rectangle
-from kivy.graphics.instructions import Canvas
-from kivy.properties import (
-    ObjectProperty, BooleanProperty, NumericProperty
-)
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.uix.image import Image
-from kivy.core.window import Window
-from kivy.uix.recycleview import RecycleView
-from kivy.uix.widget import Widget
-
-
-class Utils:
-    @staticmethod
-    def get_rectangle(filename="ground.png", pos=(0, 0), size=(100, 100)):
-        texture = Image(source=filename).texture
-        texture.mag_filter = 'nearest'
-        return Rectangle(texture=texture, size=size, pos=pos)
-
-
-class GameObject(Button):
-    def __init__(self, picture='air.png', cell_size=100, position=(-1, -1), **kwargs):
-        super().__init__(**kwargs)
-        self.background_normal = picture
-        self.background_down = self.background_normal
-
-        if position != (-1, -1):
-            self.pos = get_game().game_field.get_pos(position)
-
+from utils import GameObject
 
 class MyMeta(ABCMeta, type(GameObject)):
     pass
@@ -156,7 +132,6 @@ class Worker:
         self.dx = 0
 
     def update_rectangle(self):
-        self.rectangle = Utils.get_rectangle(filename=self.source, size=self.size, pos=self.pos)
         return self.rectangle
 
     def update_parent_n(self):
