@@ -1,6 +1,12 @@
 from kivy.graphics import Rectangle
 from kivy.uix.button import Button
 from kivy.uix.image import Image
+from kivy.app import App
+
+
+def get_game():
+    return App.get_running_app().game
+
 
 class GameObject(Button):
     def __init__(self, picture='air.png', cell_size=100, position=(-1, -1), **kwargs):

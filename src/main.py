@@ -9,7 +9,9 @@ from kivy.properties import (
 from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
-from utils import GameObject
+from utils import GameObject, get_game
+from office import Office
+from person import Worker
 
 class MyMeta(ABCMeta, type(GameObject)):
     pass
@@ -31,26 +33,6 @@ class Room(ABC, metaclass=MyMeta):
     @abstractmethod
     def repair(self):
         pass
-
-
-class Office(GameObject):
-    def __init__(self, cell_size=100, position=(0, 0), picture='../res/office.png', **kwargs):
-        self.price = 1000
-        self.pertime = 50
-        self.capacity = 4
-        self.reliability = 1000
-        self.breakdown = 15
-        self.income = 100
-
-        super().__init__(picture, **kwargs)
-
-        self.size = (6 * cell_size, cell_size)
-
-    def update(self):
-        self.reliability -= self.breakdown
-
-    def repair(self):
-        self.reliability = (self.reliability + self.breakdown * 4) % 1000
 
 
 class Cell(GameObject):
@@ -121,41 +103,6 @@ class GameField(GridLayout):
         return x * self.cell_size, (self.h - 1 - y) * self.cell_size
 
 
-class Worker:
-    def __init__(self, pos=(0, 0), source='worker.png', size=(100, 100), id=0, rectangle=None, n=0):
-        self.pos = pos
-        self.source = source
-        self.size = size
-        self.id = id
-        self.rectangle = rectangle
-        self.parent_n = n
-        self.dx = 0
-
-    def update_rectangle(self):
-        return self.rectangle
-
-    def update_parent_n(self):
-        if self.dx == 100:
-            self.parent_n += 1
-            self.dx = 0
-
-    def update(self):
-        self.move(1)
-
-    def move(self, x):
-        get_game().game_field.data[self.parent_n]['canvas'].remove(self.rectangle)
-
-        x0, y0 = self.pos
-        self.pos = (x + x0, y0)
-
-        self.update_rectangle()
-
-        self.dx += x
-        self.update_parent_n()
-
-        get_game().game_field.data[self.parent_n]['canvas'].add(self.rectangle)
-
-
 class CorporationGame(FloatLayout):
     game_field = ObjectProperty(None)
     object_layer = ObjectProperty(None)
@@ -200,28 +147,22 @@ class CorporationGame(FloatLayout):
             return
 
     def place_worker(self, pos):
-        if n >= (self.game_field.h - 1) * self.game_field.w:
-            return
-
-        cur_cell = self.game_field.data[n]
-        if cur_cell['contains_office']:
-            w = Worker(pos=pos, id=len(self.workers) + 1, n=n)
+        if self.game_field.data[pos[1]][pos[0]].contains_office:
+            w = Worker(pos=self.game_field.get_pos(pos),
+                       cell_size=self.game_field.cell_size,
+                       size_hint=(None, None))
+            self.worker_layer.add_widget(w)
             self.workers.append(w)
-            self.money -= 100
-            cur_cell['canvas'].add(w.update_rectangle())
 
     def place_office(self, pos):
         if self.game_field.can_be_placed(pos):
             self.object_layer.\
                 add_widget(Office(pos=self.game_field.get_pos(pos),
                                   cell_size=self.game_field.cell_size,
-                                  size_hint=(None, None)))
+                                  size_hint=(None, None),
+                                  position=pos))
             for i in range(6):
                 self.game_field.data[pos[1]][pos[0] + i].contains_office = True
-
-
-def get_game():
-    return CorporationApp.get_running_app().game
 
 
 def switch_state(instance):
@@ -230,16 +171,6 @@ def switch_state(instance):
         return
 
     get_game().set_state(instance.text)
-
-    if get_game().current_state != 'office':
-        if get_game().is_office_being_built:
-            k = 0
-            for i in get_game().office_buffer:
-                get_game().game_field.data[i]['canvas'].remove(get_game().office_texture_buffer[k])
-                k += 1
-            get_game().is_office_being_built = False
-
-        get_game().clear_office_buffer()
 
 
 class CorporationApp(App):
