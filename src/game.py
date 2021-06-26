@@ -17,10 +17,10 @@ class CorporationGame(FloatLayout):
     is_office_opened = False
 
     money_display = None
-    money = 0
+    money = 1100
 
     time = 0
-    salary_time = 15*60
+    salary_time = 15 * 60
 
     workers = []
     offices = []
@@ -69,15 +69,17 @@ class CorporationGame(FloatLayout):
                        size_hint=(None, None),
                        office=self.game_field.data[pos[1]][pos[0]])
             self.worker_layer.add_widget(w)
+            self.remove_money(w.price)
             self.workers.append(w)
 
     def place_office(self, pos):
         if self.game_field.can_be_placed(pos):
-            self.object_layer.\
-                add_widget(Office(pos=self.game_field.get_pos(pos),
-                                  cell_size=self.game_field.cell_size,
-                                  size_hint=(None, None),
-                                  position=pos))
+            o = Office(pos=self.game_field.get_pos(pos),
+                       cell_size=self.game_field.cell_size,
+                       size_hint=(None, None),
+                       position=pos)
+            self.remove_money(o.price)
+            self.object_layer.add_widget(o)
             for i in range(6):
                 self.game_field.data[pos[1]][pos[0] + i].contains_office = True
 

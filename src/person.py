@@ -46,7 +46,7 @@ class Person(ABC, metaclass=MyMeta):
 
 class Worker(GameObject, Person):
     def __init__(self, cell_size=100, position=(0, 0), office=None, picture='../res/worker.png', **kwargs):
-        self.price = 1000
+        self.price = 100
         self.salary = 300
         self.income = 1
         self.status = Status.WORKING
