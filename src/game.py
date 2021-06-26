@@ -19,6 +19,9 @@ class CorporationGame(FloatLayout):
     money_display = None
     money = 0
 
+    time = 0
+    salary_time = 15*60
+
     workers = []
     offices = []
 
@@ -34,10 +37,15 @@ class CorporationGame(FloatLayout):
         self.current_state = state
 
     def tick(self, dt):
+        self.time += 1
         self.money_display.text = str(self.money)
 
         for worker in self.workers:
             worker.update()
+
+            if self.time == self.salary_time:
+                self.money -= worker.salary
+                self.time = 0
 
     def place(self, pos):
         if self.current_state == 'worker':

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod, ABCMeta
 
 from kivy.app import App
+from kivy.core.audio import SoundLoader
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.properties import (

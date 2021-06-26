@@ -1,4 +1,6 @@
+from src.metaclass import MyMeta
 from utils import GameObject, get_game
+from abc import ABC, abstractmethod
 from enum import Enum
 
 
@@ -9,15 +11,49 @@ class Status(Enum):
     TOILET = 4
 
 
-class Worker(GameObject):
+class Person(ABC, metaclass=MyMeta):
+    def __init__(self):
+        self.price
+        self.salary
+        self.income
+        self.status
+        self.fatigue
+        self.toilet
+        self.office
+
+        self.working_pos
+
+    @abstractmethod
+    def update(self):
+        pass
+
+    @abstractmethod
+    def move_work(self):
+        pass
+
+    @abstractmethod
+    def move_rest(self):
+        pass
+
+    @abstractmethod
+    def move(self, step):
+        pass
+
+    @abstractmethod
+    def on_press(self):
+        pass
+
+
+class Worker(GameObject, Person):
     def __init__(self, cell_size=100, position=(0, 0), office=None, picture='../res/worker.png', **kwargs):
         self.price = 1000
-        self.pertime = 50
+        self.salary = 300
         self.income = 1
         self.status = Status.WORKING
         self.fatigue = 0
         self.toilet = 0
         self.office = office
+        self.working_pos = None
 
         super().__init__(picture, **kwargs)
 
@@ -48,10 +84,6 @@ class Worker(GameObject):
                 self.move_work()
             else:
                 self.status = Status.WORKING
-
-        # if self.toilet > 4*60*60:
-        #     self.state = State.TOILET
-        #
 
     def move_work(self):
         if self.pos[0] < self.working_pos[0]:
