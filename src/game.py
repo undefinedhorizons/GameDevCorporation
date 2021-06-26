@@ -6,6 +6,8 @@ from office import Office
 from person import Worker
 from kivy.core.audio import SoundLoader
 
+from src.toilet import Toilet
+
 
 class CorporationGame(FloatLayout):
     game_field = ObjectProperty(None)
@@ -15,6 +17,8 @@ class CorporationGame(FloatLayout):
     gui = ObjectProperty(None)
     is_worker_opened = False
     is_office_opened = False
+    current_office = 'office'
+    current_worker = 'worker'
 
     money_display = None
     money = 1100
@@ -53,7 +57,10 @@ class CorporationGame(FloatLayout):
             return
 
         if self.current_state == 'office':
-            self.place_office(pos)
+            if self.current_office == 'office':
+                self.place_office(pos)
+            else:
+                self.place_toilet(pos)
             return
 
     def add_money(self, money):
@@ -72,15 +79,26 @@ class CorporationGame(FloatLayout):
             self.remove_money(w.price)
             self.workers.append(w)
 
-    def place_office(self, pos):
-        if self.game_field.can_be_placed(pos):
+    def place_office(self, pos, length=6):
+        if self.game_field.can_be_placed(pos=pos, length=length):
             o = Office(pos=self.game_field.get_pos(pos),
                        cell_size=self.game_field.cell_size,
                        size_hint=(None, None),
                        position=pos)
             self.remove_money(o.price)
             self.object_layer.add_widget(o)
-            for i in range(6):
+            for i in range(length):
+                self.game_field.data[pos[1]][pos[0] + i].contains_office = True
+
+    def place_toilet(self, pos, length=2):
+        if self.game_field.can_be_placed(pos=pos, length=length):
+            o = Toilet(pos=self.game_field.get_pos(pos),
+                       cell_size=self.game_field.cell_size,
+                       size_hint=(None, None),
+                       position=pos)
+            self.remove_money(o.price)
+            self.object_layer.add_widget(o)
+            for i in range(length):
                 self.game_field.data[pos[1]][pos[0] + i].contains_office = True
 
     def switch_state(self, state):

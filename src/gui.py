@@ -4,7 +4,7 @@ from utils import ButtonClick, get_game
 
 
 class SelectWorkerButton(ButtonClick):
-    def __init__(self, worker_name='Worker1', **kwargs):
+    def __init__(self, worker_name='worker', **kwargs):
         self.worker_name = worker_name
         super().__init__(**kwargs)
 
@@ -14,7 +14,7 @@ class SelectWorkerButton(ButtonClick):
 
 
 class SelectOfficeButton(ButtonClick):
-    def __init__(self, office_name='Office', **kwargs):
+    def __init__(self, office_name='office', **kwargs):
         self.office_name = office_name
         super().__init__(**kwargs)
 
@@ -38,9 +38,9 @@ class RoomButton(ButtonClick):
                 get_game().gui.remove_widget(get_game().layout_worker)
                 get_game().is_worker_opened = False
             layout_office = BoxLayout(orientation='horizontal', size_hint=(.5, .6))
-            Office = SelectOfficeButton(office_name='Office', text='Office', size_hint=(.2, .2),
+            Office = SelectOfficeButton(office_name='office', text='Office', size_hint=(.2, .2),
                                         pos_hint={'x': .22, 'y': .79})
-            Toilet = SelectOfficeButton(office_name='Toilet', text='Toilet', size_hint=(.2, .2),
+            Toilet = SelectOfficeButton(office_name='toilet', text='Toilet', size_hint=(.2, .2),
                                         pos_hint={'x': .22, 'y': .79})
             layout_office.add_widget(Office)
             layout_office.add_widget(Toilet)
@@ -68,11 +68,11 @@ class WorkerButton(ButtonClick):
                 get_game().gui.remove_widget(get_game().layout_office)
                 get_game().is_office_opened = False
             layout_worker = BoxLayout(orientation='horizontal', size_hint=(.5, .6))
-            build_worker1 = SelectWorkerButton(worker_name='Worker',
+            build_worker1 = SelectWorkerButton(worker_name='worker',
                                                text='Worker',
                                                size_hint=(.2, .2),
                                                pos_hint={'x': .22, 'y': .79})
-            build_worker2 = SelectWorkerButton(worker_name='RepairMan',
+            build_worker2 = SelectWorkerButton(worker_name='repairman',
                                                text='RepairMan',
                                                size_hint=(.2, .2),
                                                pos_hint={'x': .22, 'y': .79})
