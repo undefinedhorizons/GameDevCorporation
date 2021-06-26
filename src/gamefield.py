@@ -1,9 +1,9 @@
-from src.Cell import Cell
+from src.cell import Cell
 from utils import GameObject, get_game
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
 from grass import Grass
-from Cell import Cell
+from cell import Cell
 
 
 class GameField(GridLayout):

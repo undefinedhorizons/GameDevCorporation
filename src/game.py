@@ -4,6 +4,8 @@ from kivy.properties import (
 )
 from office import Office
 from person import Worker
+from kivy.core.audio import SoundLoader
+
 
 class CorporationGame(FloatLayout):
     game_field = ObjectProperty(None)
@@ -17,18 +19,21 @@ class CorporationGame(FloatLayout):
     workers = []
     offices = []
 
-    office_texture_buffer = []
-    overlay_buffer = []
-    office_buffer = []
-    is_office_being_built = False
-
     current_state = 'none'
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+    @staticmethod
+    def play_background_sound():
+        background_sound = SoundLoader.load('../res/sound/background_sound.wav')
+        if background_sound:
+            background_sound.play()
+            background_sound.loop = True
+
     def prepare(self):
         self.game_field.fill_grass()
+        self.play_background_sound()
 
     def set_state(self, state):
         self.current_state = state

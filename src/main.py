@@ -12,7 +12,7 @@ from kivy.uix.gridlayout import GridLayout
 from utils import GameObject, get_game
 from office import Office
 from person import Worker
-from Cell import Cell
+from cell import Cell
 from grass import Grass
 from gamefield import GameField
 from game import CorporationGame

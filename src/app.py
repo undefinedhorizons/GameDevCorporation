@@ -5,6 +5,7 @@ from kivy.clock import Clock
 from kivy.app import App
 from switch_state import switch_state
 
+
 class CorporationApp(App):
     game = None
 
