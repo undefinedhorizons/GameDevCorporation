@@ -32,7 +32,8 @@ class CorporationApp(App):
 
 
     def play_backgroud_sound(self):
-        background_sound = SoundLoader.load('../res/sound/background_sound.wav')
-        if background_sound:
-            background_sound.play()
-            background_sound.loop = True
+        pass
+        # background_sound = SoundLoader.load('../res/sound/background_sound.wav')
+        # if background_sound:
+        #     background_sound.play()
+        #     background_sound.loop = True

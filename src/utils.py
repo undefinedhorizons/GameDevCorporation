@@ -18,6 +18,7 @@ class GameObject(Button):
 
 class ButtonClick(Button):
     def on_press(self):
-        sound = SoundLoader.load('../res/sound/button.wav')
-        if sound:
-            sound.play()
+        pass
+        # sound = SoundLoader.load('../res/sound/button.wav')
+        # if sound:
+        #     sound.play()
