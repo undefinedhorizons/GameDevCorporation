@@ -4,7 +4,7 @@ from utils import ButtonClick, get_game
 
 
 class SelectWorkerButton(ButtonClick):
-    def __init__(self, worker_name='worker', **kwargs):
+    def __init__(self, worker_name='person', **kwargs):
         self.worker_name = worker_name
         super().__init__(**kwargs)
 
@@ -62,13 +62,14 @@ class WorkerButton(ButtonClick):
 
     def on_press(self):
         super().on_press()
-        get_game().switch_state('worker')
+        get_game().switch_state('person')
         if not get_game().is_worker_opened:
             if get_game().is_office_opened:
                 get_game().gui.remove_widget(get_game().layout_office)
                 get_game().is_office_opened = False
+
             layout_worker = BoxLayout(orientation='horizontal', size_hint=(.5, .6))
-            build_worker1 = SelectWorkerButton(worker_name='worker',
+            build_worker1 = SelectWorkerButton(worker_name='person',
                                                text='Worker',
                                                size_hint=(.2, .2),
                                                pos_hint={'x': .22, 'y': .79})
@@ -76,6 +77,7 @@ class WorkerButton(ButtonClick):
                                                text='RepairMan',
                                                size_hint=(.2, .2),
                                                pos_hint={'x': .22, 'y': .79})
+
             layout_worker.add_widget(build_worker1)
             layout_worker.add_widget(build_worker2)
             get_game().gui.add_widget(layout_worker)

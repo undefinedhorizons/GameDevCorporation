@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod, ABCMeta
-from metaclass import MyMeta
+from src.metaclass import MyMeta
 
 
 class Room(ABC, metaclass=MyMeta):
@@ -8,6 +8,7 @@ class Room(ABC, metaclass=MyMeta):
         self.pertime
         self.capacity
         self.reliability
+        self.max_reliability
         self.breakdown
         self.income
 
@@ -16,5 +17,5 @@ class Room(ABC, metaclass=MyMeta):
         pass
 
     @abstractmethod
-    def repair(self):
+    def repair(self, amount):
         pass

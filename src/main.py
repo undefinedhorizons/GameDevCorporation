@@ -11,8 +11,8 @@ from kivy.uix.button import Button
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
 from utils import GameObject, get_game
-from office import Office
-from person import Worker
+from src.room.office import Office
+from src.person.worker import Worker
 from cell import Cell
 from grass import Grass
 from gamefield import GameField
