@@ -8,5 +8,4 @@ class Cell(GameObject):
         self.contains_office = False
 
     def on_press(self):
-        print(self.position)
         get_game().place(self.position)

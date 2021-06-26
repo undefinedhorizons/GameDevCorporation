@@ -48,11 +48,18 @@ class CorporationGame(FloatLayout):
             self.place_office(pos)
             return
 
+    def add_money(self, money):
+        self.money += money
+
+    def remove_money(self, money):
+        self.money -= money
+
     def place_worker(self, pos):
         if self.game_field.data[pos[1]][pos[0]].contains_office:
             w = Worker(pos=self.game_field.get_pos(pos),
                        cell_size=self.game_field.cell_size,
-                       size_hint=(None, None))
+                       size_hint=(None, None),
+                       office=self.game_field.data[pos[1]][pos[0]])
             self.worker_layer.add_widget(w)
             self.workers.append(w)
 

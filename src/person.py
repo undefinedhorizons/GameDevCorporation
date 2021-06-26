@@ -1,18 +1,70 @@
-from utils import GameObject
+from utils import GameObject, get_game
+from enum import Enum
+
+
+class Status(Enum):
+    WORKING = 1
+    RESTING = 2
+    GOING_TO_WORK = 3
+    TOILET = 4
 
 
 class Worker(GameObject):
-    def __init__(self, cell_size=100, position=(0, 0), picture='../res/worker.png', **kwargs):
+    def __init__(self, cell_size=100, position=(0, 0), office=None, picture='../res/worker.png', **kwargs):
         self.price = 1000
         self.pertime = 50
-        self.income = 100
+        self.income = 1
+        self.status = Status.WORKING
+        self.fatigue = 0
+        self.toilet = 0
+        self.office = office
 
         super().__init__(picture, **kwargs)
 
+        self.working_pos = (self.pos[0], self.pos[1])
         self.size = (cell_size, cell_size)
 
     def update(self):
-        self.move(step=1)
+        if self.status == Status.WORKING:
+            self.fatigue += 1
+            get_game().add_money(self.income)
+
+        self.toilet += 2
+        # self.move(step=1)
+
+        if self.status != Status.RESTING and self.status != Status.TOILET and self.fatigue > 10*60:
+            self.status = Status.RESTING
+
+        if self.status == Status.RESTING:
+            if self.fatigue > 0:
+                self.fatigue -= 3
+            self.move_rest()
+
+        if self.fatigue <= 0 and self.status != Status.WORKING and self.status != Status.GOING_TO_WORK:
+            self.status = self.status.GOING_TO_WORK
+
+        if self.status == Status.GOING_TO_WORK:
+            if self.pos[0] != self.working_pos[0]:
+                self.move_work()
+            else:
+                self.status = Status.WORKING
+
+        # if self.toilet > 4*60*60:
+        #     self.state = State.TOILET
+        #
+
+    def move_work(self):
+        if self.pos[0] < self.working_pos[0]:
+            self.move(1)
+        else:
+            self.move(-1)
+
+    def move_rest(self):
+        if self.pos[0] + self.width < self.office.pos[0] + 6 * self.office.width:
+            self.move(1)
 
     def move(self, step):
-        self.pos = self.pos[0] + step, self.pos[1] + step
+        self.pos = self.pos[0] + step, self.pos[1]
+
+    def on_press(self):
+        print(self.status, self.fatigue)

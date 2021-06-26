@@ -38,7 +38,6 @@ class GameField(GridLayout):
 
     def can_be_placed(self, pos):
         for i in range(6):
-            print(pos[0] + i, pos[1])
             if self.data[pos[1]][pos[0] + i].contains_office:
                 return False
 

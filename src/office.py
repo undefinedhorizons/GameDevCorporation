@@ -1,6 +1,8 @@
 from utils import GameObject, get_game
+from Room import Room
 
-class Office(GameObject):
+
+class Office(GameObject, Room):
     def __init__(self, cell_size=100, position=(0, 0), picture='../res/office.png', **kwargs):
         self.price = 1000
         self.pertime = 50
