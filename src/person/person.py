@@ -1,5 +1,5 @@
 from src.metaclass import MyMeta
-from utils import GameObject, get_game
+from src.utils import GameObject, get_game
 from abc import ABC, abstractmethod
 from enum import Enum
 
