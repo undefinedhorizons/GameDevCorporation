@@ -4,6 +4,7 @@ from kivy.properties import (
 )
 from office import Office
 from person import Worker
+from person import RepairMan
 from kivy.core.audio import SoundLoader
 
 from src.toilet import Toilet
@@ -41,6 +42,9 @@ class CorporationGame(FloatLayout):
         self.current_state = state
 
     def tick(self, dt):
+        if self.money <= -100:
+            pass
+
         self.time += 1
         self.money_display.text = str(self.money)
 
@@ -53,7 +57,10 @@ class CorporationGame(FloatLayout):
 
     def place(self, pos):
         if self.current_state == 'worker':
-            self.place_worker(pos)
+            if self.current_worker == 'worker':
+                self.place_worker(pos)
+            else:
+                self.place_repairman(pos)
             return
 
         if self.current_state == 'office':
@@ -78,6 +85,16 @@ class CorporationGame(FloatLayout):
             self.worker_layer.add_widget(w)
             self.remove_money(w.price)
             self.workers.append(w)
+
+    def place_repairman(self, pos):
+        if self.game_field.data[pos[1]][pos[0]].contains_office:
+            r = RepairMan(pos=self.game_field.get_pos(pos),
+                          cell_size=self.game_field.cell_size,
+                          size_hint=(None, None),
+                          office=self.game_field.data[pos[1]][pos[0]])
+            self.worker_layer.add_widget(r)
+            self.remove_money(r.price)
+            self.workers.append(r)
 
     def place_office(self, pos, length=6):
         if self.game_field.can_be_placed(pos=pos, length=length):
