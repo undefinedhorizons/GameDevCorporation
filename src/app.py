@@ -1,15 +1,18 @@
+from kivy.core.audio import SoundLoader
+
 from game import CorporationGame
-from utils import get_game
+from src.gui import RoomButton, WorkerButton
+from utils import get_game, ButtonClick
 from kivy.uix.button import Button
 from kivy.clock import Clock
 from kivy.app import App
-from switch_state import switch_state
 
 
 class CorporationApp(App):
     game = None
 
     def build(self):
+        self.play_backgroud_sound()
         self.game = CorporationGame()
         self.game.prepare()
         self.load_gui()
@@ -17,16 +20,19 @@ class CorporationApp(App):
         return self.game
 
     def load_gui(self):
-        build_office = Button(text='office', size_hint=(.2, .2), pos_hint={'x': .01, 'y': .79})
-        build_worker = Button(text='worker', size_hint=(.2, .2), pos_hint={'x': .22, 'y': .79})
+        build_office = RoomButton()
+        build_worker = WorkerButton()
         money_display = Button(text=str(get_game().money), size_hint=(.2, .2), pos_hint={'x': .79, 'y': .79})
 
         get_game().money_display = money_display
-
-        build_worker.bind(on_press=switch_state)
-        build_office.bind(on_press=switch_state)
-
         gui = get_game().gui
         gui.add_widget(build_office)
         gui.add_widget(build_worker)
         gui.add_widget(money_display)
+
+
+    def play_backgroud_sound(self):
+        background_sound = SoundLoader.load('../res/sound/background_sound.wav')
+        if background_sound:
+            background_sound.play()
+            background_sound.loop = True

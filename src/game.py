@@ -11,7 +11,10 @@ class CorporationGame(FloatLayout):
     game_field = ObjectProperty(None)
     object_layer = ObjectProperty(None)
     worker_layer = ObjectProperty(None)
+
     gui = ObjectProperty(None)
+    is_worker_opened = False
+    is_office_opened = False
 
     money_display = None
     money = 0
@@ -24,16 +27,8 @@ class CorporationGame(FloatLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-    @staticmethod
-    def play_background_sound():
-        background_sound = SoundLoader.load('../res/sound/background_sound.wav')
-        if background_sound:
-            background_sound.play()
-            background_sound.loop = True
-
     def prepare(self):
         self.game_field.fill_grass()
-        self.play_background_sound()
 
     def set_state(self, state):
         self.current_state = state
@@ -77,3 +72,10 @@ class CorporationGame(FloatLayout):
                                   position=pos))
             for i in range(6):
                 self.game_field.data[pos[1]][pos[0] + i].contains_office = True
+
+    def switch_state(self, state):
+        if state == self.current_state:
+            self.set_state('none')
+            return
+
+        self.set_state(state)

@@ -16,7 +16,6 @@ from cell import Cell
 from grass import Grass
 from gamefield import GameField
 from game import CorporationGame
-from switch_state import switch_state
 from app import CorporationApp
 
 
