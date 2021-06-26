@@ -1,4 +1,4 @@
-from CorporationGame import CorporationGame
+from game import CorporationGame
 from utils import get_game
 from kivy.uix.button import Button
 from kivy.clock import Clock

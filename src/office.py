@@ -1,5 +1,5 @@
 from utils import GameObject, get_game
-from Room import Room
+from room import Room
 
 
 class Office(GameObject, Room):

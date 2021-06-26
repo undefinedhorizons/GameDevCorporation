@@ -13,11 +13,11 @@ from utils import GameObject, get_game
 from office import Office
 from person import Worker
 from Cell import Cell
-from Grass import Grass
-from GameField import GameField
-from CorporationGame import CorporationGame
+from grass import Grass
+from gamefield import GameField
+from game import CorporationGame
 from switch_state import switch_state
-from CorporationApp import CorporationApp
+from app import CorporationApp
 
 
 if __name__ == '__main__':

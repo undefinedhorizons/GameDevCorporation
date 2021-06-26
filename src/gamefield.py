@@ -2,7 +2,7 @@ from src.Cell import Cell
 from utils import GameObject, get_game
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
-from Grass import Grass
+from grass import Grass
 from Cell import Cell
 
 
