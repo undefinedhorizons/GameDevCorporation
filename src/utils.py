@@ -1,3 +1,4 @@
+from kivy.core.audio import SoundLoader
 from kivy.graphics import Rectangle
 from kivy.uix.button import Button
 from kivy.uix.image import Image
@@ -9,7 +10,7 @@ def get_game():
 
 
 class GameObject(Button):
-    def __init__(self, picture='../res/air.png', cell_size=100, position=(-1, -1), **kwargs):
+    def __init__(self, picture='air.png', cell_size=100, position=(-1, -1), **kwargs):
         super().__init__(**kwargs)
         self.background_normal = picture
         self.background_down = self.background_normal
@@ -17,7 +18,6 @@ class GameObject(Button):
 
 class ButtonClick(Button):
     def on_press(self):
-        pass
-        # sound = SoundLoader.load('../res/sound/button.wav')
-        # if sound:
-        #     sound.play()
+        sound = SoundLoader.load('button.wav')
+        if sound:
+            sound.play()

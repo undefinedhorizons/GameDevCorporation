@@ -3,7 +3,7 @@ from utils import GameObject, get_game
 
 
 class Worker(GameObject, Person):
-    def __init__(self, cell_size=100, position=(0, 0), office=None, picture='../res/worker.png', **kwargs):
+    def __init__(self, cell_size=100, position=(0, 0), office=None, picture='worker.png', **kwargs):
         self.price = 100
         self.salary = 600
         self.income = 2

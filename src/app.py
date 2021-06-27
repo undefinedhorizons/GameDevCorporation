@@ -1,6 +1,9 @@
+from kivy.core.audio import SoundLoader
+
 from game import CorporationGame
-from gui import RoomButton, WorkerButton
+from src.gui import RoomButton, WorkerButton
 from utils import get_game, ButtonClick
+from gamefield import GameField
 from kivy.uix.button import Button
 from kivy.clock import Clock
 from kivy.app import App
@@ -28,10 +31,8 @@ class CorporationApp(App):
         gui.add_widget(build_worker)
         gui.add_widget(money_display)
 
-
     def play_backgroud_sound(self):
-        pass
-        # background_sound = SoundLoader.load('../res/sound/background_sound.wav')
-        # if background_sound:
-        #     background_sound.play()
-        #     background_sound.loop = True
+        background_sound = SoundLoader.load('background_sound.wav')
+        if background_sound:
+            background_sound.play()
+            background_sound.loop = True

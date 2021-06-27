@@ -3,7 +3,7 @@ from room import Room
 
 
 class Office(GameObject, Room):
-    def __init__(self, cell_size=100, position=(0, 0), picture='../res/office.png', **kwargs):
+    def __init__(self, cell_size=100, position=(0, 0), picture='office.png', **kwargs):
         self.price = 1000
         self.pertime = 50
         self.capacity = 4

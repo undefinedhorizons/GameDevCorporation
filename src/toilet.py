@@ -3,7 +3,7 @@ from room import Room
 
 
 class Toilet(GameObject, Room):
-    def __init__(self, cell_size=100, position=(0, 0), picture='../res/toilet.png', **kwargs):
+    def __init__(self, cell_size=100, position=(0, 0), picture='./toilet.png', **kwargs):
         self.price = 500
         self.pertime = 30
         self.capacity = 2

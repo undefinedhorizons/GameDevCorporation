@@ -116,6 +116,7 @@ class CorporationGame(FloatLayout):
                        cell_size=self.game_field.cell_size,
                        size_hint=(None, None),
                        position=pos)
+            self.object_layer.add_widget(t)
             self.remove_money(t.price)
             for i in range(length):
                 self.game_field.data[pos[1]][pos[0] + i].contains_office = True
