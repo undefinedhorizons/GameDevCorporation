@@ -1,5 +1,3 @@
-from kivy.core.audio import SoundLoader
-
 from game import CorporationGame
 from src.gui import RoomButton, WorkerButton
 from utils import get_game, ButtonClick

@@ -1,4 +1,3 @@
-from kivy.core.audio import SoundLoader
 from kivy.graphics import Rectangle
 from kivy.uix.button import Button
 from kivy.uix.image import Image
