@@ -1,5 +1,5 @@
 from game import CorporationGame
-from src.gui import RoomButton, WorkerButton
+from gui import RoomButton, WorkerButton
 from utils import get_game, ButtonClick
 from kivy.uix.button import Button
 from kivy.clock import Clock

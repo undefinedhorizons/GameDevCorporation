@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod, ABCMeta
-from src.metaclass import MyMeta
+from metaclass import MyMeta
 
 
 class Room(ABC, metaclass=MyMeta):

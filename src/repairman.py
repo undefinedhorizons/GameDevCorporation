@@ -1,5 +1,5 @@
-from src.person.person import Person, Status
-from src.utils import GameObject
+from person import Person, Status
+from utils import GameObject
 
 
 class Repairman(GameObject, Person):

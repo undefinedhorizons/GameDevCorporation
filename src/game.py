@@ -2,11 +2,11 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.properties import (
     ObjectProperty
 )
-from src.room.office import Office
-from person.worker import Worker
-from person.repairman import Repairman
+from src.office import Office
+from src.worker import Worker
+from src.repairman import Repairman
 
-from src.room.toilet import Toilet
+from src.toilet import Toilet
 
 
 class CorporationGame(FloatLayout):

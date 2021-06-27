@@ -1,5 +1,5 @@
-from src.person.person import Person, Status
-from src.utils import GameObject, get_game
+from person import Person, Status
+from utils import GameObject, get_game
 
 
 class Worker(GameObject, Person):

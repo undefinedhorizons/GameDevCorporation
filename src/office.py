@@ -1,5 +1,5 @@
-from src.utils import GameObject, get_game
-from src.room.room import Room
+from utils import GameObject, get_game
+from room import Room
 
 
 class Office(GameObject, Room):
